@@ -1,0 +1,96 @@
+POE-Component-PSD version 0.01
+==============================
+
+An HTTP/HTTPS "Persistent Session Daemon" and CGI accelerator.
+
+Summary:
+
+. a new approach to true persistent session processes with CGI
+. lightweight event-driven HTTP/HTTPS server manages sessions
+. each CGI session runs in it's own process--no more overlaps!
+. based on a pattern I call "Server / Controller / SubProcess"
+   a hugely useful pattern that consists of three components: 
+   a network server, a process manager, and a set of child 
+   processes that asynchronously perform long-running tasks 
+
+. ability to direct-connect, or proxy through an Apache server
+. proxy/redirection URLs integrate seamlessly w/existing apps
+. can load balance w/multiple servers, or on multiple hosts
+. uses Apache-style directives in the server configuration file
+. back-end CGI is a file descriptor; not limited to Perl scripts
+
+. includes subclass of CGI.pm to help with persistence issues
+. includes a module to selectively proxy from Apache server
+. includes two alternatives to adding another Perl module into
+   your Apache server: using either mod_proxy or mod_rewrite
+. includes a script to create/self-sign SSL server certificates
+. no recompiling Apache or building C-libs is necessary (well,
+   unless you need to add mod_proxy, mod_ssl or OpenSSL)
+
+. has other uses, too, such as URL-addressable shared memory
+. great for secure access to user data and/or on machines where 
+   running a full Web server is not appropriate
+
+It's still somewhere between a proof-of-concept and a prototype, 
+and is a bit rough around the edges. Your feedback is welcome.
+
+Planned improvements include the following.
+. support additional Apache-style configuration directives
+   such as <VirtualHost> for concurrent HTTP and HTTPS
+. able to "resume" sessions after timeout, not just "restart"
+   based on session config settings
+. support for "admin" sessions to query the PSD server
+. support for configurable number of session cookies, with
+   some number of read-only and some number of read-write
+. add some client script examples of login and access
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+Standard modules
+   CGI
+   POSIX
+   File::Handle
+
+Additional packages required
+   Apache-Admin-Config
+   Digest-MD5
+   IO-Socket-SSL
+   Net-SSLeay
+   POE
+   POE-Component-Server-SimpleHTTP
+   POE-Component-SSLify
+   PTools
+   Time-HiRes
+
+   OpenSSL libraries and executable
+   Apache Web server with mod_ssl and mod_proxy
+   (mod_rewrite optionally can be used)
+
+Optional with mod_perl 1.x
+   Apache::Constants
+   Apache::URI
+
+Optional with mod_perl 2.x (i.e.: version 1.99)
+   Apache2::Const
+   Apache2::URI
+   APR::URI
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2007 by Chris Cobb
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

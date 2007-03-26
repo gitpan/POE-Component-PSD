@@ -1,0 +1,48 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+demo/README
+demo/bin/buildCert.pl
+demo/bin/psdServer.pl
+demo/conf/psd_max.conf
+demo/conf/psd_min.conf
+demo/data/ssl/readme           # ssl is "empty" directory
+### demo/lib                   # need a symlink to ../lib
+demo/webdoc/session/index.html
+demo/webcgi/session/demo.pl
+lib/Apache/UriProxy.pm
+lib/Apache2/UriProxy.pm
+lib/POE/Component/PSD/Client.pm
+lib/POE/Component/PSD/Client/Login.pm
+lib/POE/Component/PSD/Server.pm
+lib/POE/Component/PSD/Server/Auth.pm
+lib/POE/Component/PSD/Server/CGI.pm
+lib/POE/Component/PSD/Server/Config.pm
+lib/POE/Component/PSD/Server/HTTP.pm
+lib/POE/Component/PSD/Server/Log.pm
+lib/POE/Component/PSD/Server/Manager.pm
+lib/POE/Component/PSD/Server/Overview.pod
+lib/POE/Component/PSD/Server/Session.pm
+lib/POE/Component/PSD/Server/SessionEntry.pm
+t/Apache/UriProxy.t
+t/Apache2/UriProxy.t
+# t/POE/Component/PSD/Client.t    # placeholders
+# t/POE/Component/PSD/Client/Login.t
+t/POE/Component/PSD/Server.t
+t/POE/Component/PSD/Server/Auth.t
+t/POE/Component/PSD/Server/CGI.t
+t/POE/Component/PSD/Server/Config.t
+t/POE/Component/PSD/Server/HTTP.t
+t/POE/Component/PSD/Server/Log.t
+t/POE/Component/PSD/Server/Manager.t
+t/POE/Component/PSD/Server/Session.t
+t/POE/Component/PSD/Server/SessionEntry.t
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm

@@ -1,0 +1,168 @@
+# -*- Perl -*-
+#
+# File:  POE/Component/Server/PSD/Overview.pod
+# Desc:  A brief overview of the PSD session daemon
+#
+
+__END__
+
+=head1 NAME
+
+PSD - A 'Process Session Daemon' for CGI applications
+
+=head1 VERSION
+
+This document is not specific to any version of the PSD application.
+
+=head1 DESCRIPTION
+
+This document describes the motivation and usage of the
+Process Session Daemon (PSD) server and related components.
+
+=head2 Background 
+
+After working for several years building Websites and writing CGI 
+scripts in the mid 1990s I moved on to other projects. Coming 
+back to this environment recently, I finally had the opportunity to 
+start using B<mod_perl> with the Apache 2.x Web server. After looking 
+forward to gaining some experience in this area for many years, when I 
+finally did start down this path it was with decidedly mixed reactions.
+
+Using B<mod_perl> to access the Apache API is truly a wonderful
+thing. Having the full power of Perl available to access and
+manipulate the internal server data structures, and the ability to
+create simple Perl modules that can alter the server flow is
+more than I ever imagined that B<mod_perl> could do.
+
+On the other hand, struggling with the CGI acceleration environment
+that B<mod_perl> provides was a far less exhilerating experience.
+Trying to modify an existing Perl module hierarchy where several
+different applications use a module of the same name to store and
+manage separate 'global' data was an exercise in frustration.
+Only the first application to load in a given Web server instance
+would 'win'. The other apps would fail to work properly, unless 
+they just I<happened> to load first in a different Web server instance.
+Trying to rework the various modules failed due to the way B<mod_perl>
+manipulates the variable name space.
+
+Trying to mix'n'match Perl versions is another area where B<mod_perl>
+as a CGI accelerator is lacking. A minimal Perl 5.8.0 was included with 
+the Apache server we are using. While, in addition to a few of the 
+Apache-related modiles, it did include LWP and an XML parser, it didn't 
+begin to have the modules in our Perl 5.6.1 distribution that I've come 
+to rely on in day-to-day programming.
+
+So I could either 'downgrade' B<mod_perl> to Perl 5.6.1 or start up a
+fairly major project to build a Perl 5.8.x distribution (along with 
+the thousand or so CPAN modules that I like to have around) and upgrade
+B<mod_perl> to match. Neither option was a good fit given our current 
+project schedule.
+
+=head2 Yet Another CGI Accelerator
+
+It occurred to me that perhaps a monolithic, cumbersom process to embed
+a Perl-based CGI environment into the Web server was not an optimal
+solution, especially when this B<and> application modules are replicated 
+into each and every Web server subprocess/thread/instance. 
+
+Why not create a simple external component that could maintain a 
+"persistent session environment" for CGI processes that did not rely on 
+any particular version of Perl or, for that matter, on B<any> particular 
+programming language. And, unlike FastCGI, it should use simple HTTP
+protocols instead of requiring a set of custom interface libraries.
+
+Starting with several of the POE modules it was possible in a few days to 
+model a simple demo based on a programming pattern that I call "Server / 
+Controller / SubProcess". This is a hugely useful pattern that consists
+of three components: a network server, a process manager, and a set of
+child processes that perform long-running tasks in the background.
+
+Then, using B<mod_perl> and an example from Chapter 7 of the the book 
+"Writing Apache Modules" (by Stein, MacEachern, Pub by O'Reilly), it
+was trivial to create a simple SSL proxy/tunnel from Apache out to
+the "Process Session Daemon" (PSD). Did I mention how I<amazing>
+B<mod_perl> is for Apache API access?
+
+The result is an HTTP server daemon that uses SSL connections to 
+provide security for logins and manages child processes to provide
+a persistent, high-speed cache to accelerate CGI scripts. And, since
+we've validated the user during login, each child process can run
+with the user and group id of the given user.
+
+Add to that a slight modification to the CGI.pm module (via a subclass 
+that adapts the I/O streams in CGI scripts to the asychronous POE-based 
+event-driven model) and adapting CGI scripts to run in this new enviroment 
+is a breeze.
+
+The PSD server can run on the same host as the Web server, or it can
+just as easily run on any other machine. This is great for environments
+where it is not appropriate to run a full Web server on a given machine,
+but access to a user's private data would still be useful. Multiple
+PSD servers can be started to accomodate various load balancing needs.
+
+Given the PSD architecture, a user can have multiple concurrent session
+processes running with each one in a different 'realm' (for want of a 
+better term). This is very nearly equivalent to the 'Basic Authentication 
+Realms' that exist when using standard 'htaccess' protection but perhaps 
+another term would be better here.
+
+The PSD server is a rudimentary HTTP/HTTPS Web server, so proxying
+session requests through Apache is not necessary. However, the proxy
+setup does allow using the full power and efficiency of Apache. Most
+of a user's browser requests during a given session may not need to
+access private data. Up to 90% or more of the user's requests could
+simply access the Apache server (for images, static HTML, dynamic HTML 
+w/JavaScript and Style Sheets, PHP parsing, etc.), while perhaps only 
+10% or less of the requests would need to be proxied to the PSD server 
+for private data access and/or session state.
+
+And, as an extra bonus, no recompiling Apache or Apache modules is
+required. Simple config file directives are used to glue all of the
+components together.
+
+=head2 Architecture Diagram
+
+
+=head2 Components 
+
+The B<psd.pl> server command is used to start, stop and control
+the PSD server process.
+
+Clients can be users running Web browsers, and/or scripts that 
+understand the HTTP/HTTPS protocols.
+
+The B<Apache::UriProxy> or B<Apache2::UriProxy> classes can be used 
+to seamlessly integrate an existing Apache Web with the PSD server.
+
+
+=head1 DEPENDENCIES
+
+The PSD server depends upon the following.
+
+The basic POE distribution from CPAN, with the addition of the related
+L<POE::Component::Server::SimpleHTTP> and L<POE::Component::SSLify> 
+classes. The L<Time::HiRes> and L<Digest::MD5> classes are also required.
+
+An optional but suggested component includeds either the Apache::UriProxy
+class (for mod_perl 1.x) or the Apache2::UriProxy class (for mod_perl 1.99, 
+aka 2.x) that selectively proxy http/https requests to the session daemon.
+
+=head1 SEE ALSO
+
+See the L<Apache2::UriProxy> class for two alternative proxy mechanisms.
+It is possible to use either B<mod_proxy> or B<mod_rewrite> to proxy
+URIs to the PSD server instead of adding a Perl module to your Apache 
+Web server.
+
+=head1 AUTHOR
+
+Chris Cobb, E<lt>chris@ccobb.netE<gt>
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2006-2007 by Chris Cobb. All rights reserved. 
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,86 @@
+
+#-----------------------------------------------------------------------
+# README: Getting started with the Persistent Session Daemon web server
+#-----------------------------------------------------------------------
+
+You can run a demo server right from this temporary distribution area.
+
+.  On systems that allow symbolic file links, create a link in
+   this 'demo' subdirectory as follows.
+     
+      ln -s ../lib lib
+
+   On all other systems, copy the entire contents of the lib 
+   subdirectory into this 'demo' directory.
+
+      copy ../lib .           # or whatever file copy you use
+
+.  Generate a set of server certificate files
+      bin/buildCert.pl 
+      bin/buildCert.pl -h     # for notes on all the prompts
+
+.  Make some quick edits to the PSD configuration data file.
+   The configuration file is located under this directory. 
+
+      conf/psd_min.conf
+
+   Set values for the following directives. The ServerRoot
+   must be the full path down to the 'demo' subdirectory
+   where this README file resides.
+
+      Directive   Examples
+      ----------- ----------------------
+      ServerRoot  /full/path/to/demo
+      Listen      ip.address:19665
+      ServerName  hostname.domain:19665
+      User        uname
+      Group       gname
+
+.  Start the PSD server daemon process. To skip the 'session
+   detach' step of the daemon and watch connections on your
+   terminal, run the server with the "-D" switch (--Debug).
+
+      bin/psdServer.pl
+      bin/psdServer.pl  -D 5     # to skip session detach 
+
+.  Try connecting to the PSD Web server using your browser.
+   You will be prompted to accept an SSL certificate (so
+   remember to use "https://" and not "http://"). Use the
+   same port number you added to the configuration file.
+
+      https://your.server.whatever:19665/session/
+
+.  If you ran the PSD server as a daemon, you can gracefully
+   shutdown the process using the 'psdServer.pl' command.
+
+      psdServer.pl -shutdown
+
+.  If you see a Web page with a link to start a session,
+   and that link actually starts a session, then it works!
+
+#-----------------------------------------------------------------------
+
+The next step is optional. If you want to configure an Apache Web
+server to proxy certain requests to your PSD server, see notes in
+the Apache2::UriProxy class, included with this distribution.
+
+There are at least three ways to accomplish this proxy setup,
+so pick the one that you are most comfortable using.
+
+   o  you can add Apache2::UriProxy into your Apache server
+
+   o  you can use mod_proxy directives instead, or
+
+   o  you can use mod_rewrite directives
+
+Each of these alternatives is explained in Apache2::UriProxy.
+
+This setup will require the following Apache modules. At a
+minimum, you will need to have SSL access to your Apache
+server before you try configuring it for proxy to the PSD.
+
+   o  mod_ssl       - required
+   o  mod_proxy     - required
+   o  mod_rewrite   - optional
+
+#-----------------------------------------------------------------------
